@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #messages { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; margin-bottom: 10px; }
+        .message { margin: 5px 0; padding: 8px; background: #f0f0f0; border-radius: 4px; }
+        #input-container { display: flex; gap: 10px; }
+        #messageInput { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="messages"></div>
+    <div id="button-container" style="margin-bottom: 10px;">
+        <button onclick="fetchText()" style="background: #28a745;">读取文件内容</button>
+    </div>
+    <div id="input-container">
+        <input type="text" id="messageInput" placeholder="输入消息...">
+        <button onclick="sendMessage()">发送</button>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://10.182.1.100:3000/chat');
+        const messagesDiv = document.getElementById('messages');
+
+        ws.onmessage = (event) => {
+            const message = document.createElement('div');
+            message.className = 'message';
+            messagesDiv.innerHTML = `<div class="message"><strong>最新消息：</strong>${event.data}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            if (input.value.trim()) {
+                ws.send(input.value);
+                input.value = '';
+            }
+        }
+
+        // 支持Enter键发送
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+  
+        async function fetchText() {
+            try {
+                const response = await fetch("http://10.182.1.100:8000/sample.txt");
+
+                 const text  = await response.text();
+                // console.log(text);
+                if(text.length > 0) {
+                    document.getElementById('messageInput').value = text;
+                    sendMessage();
+                    // readPosition = end;
+                    // localStorage.setItem('readPosition', readPosition);
+                    messagesDiv.innerHTML = `<div class="message success">成功读取 ${text.length} 字符</div>`;
+                } 
+            }catch (error) {
+                console.error('文件读取失败', error);
+            }
+        };
+    </script>
+</body>
+</html>

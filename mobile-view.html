@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>移动阅读</title>
+    <style>
+        :root {
+            --text-size: calc(1rem + 2vw);
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh;
+            background: var(--bg-color);
+            font-family: -apple-system, sans-serif;
+            padding: 1rem;
+            line-height: 1.6;
+        }
+
+        .content-box {
+            width: min(90vw, 600px);
+            font-size: var(--text-size);
+            color: var(--text-color);
+            text-align: justify;
+            hyphens: auto;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1a1a1a;
+                --text-color: #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-box" id="amtf">
+        这里是您需要显示的50字左右内容。本页面已针对移动端优化，支持自动换行、深色模式适配，文字大小会根据屏幕尺寸自动调整，确保最佳阅读体验。
+    </div>
+</body>
+<script>
+            const ws = new WebSocket('ws://10.182.1.100:3000/chat');
+        const messagesDiv = document.getElementById('amtf');
+
+        ws.onmessage = (event) => {
+            // const message = document.createElement('div');
+            // message.className = 'message';
+            messagesDiv.innerHTML = `<div class="message"><strong>最新消息：</strong>${event.data}</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        };
+</script>
+</html>
